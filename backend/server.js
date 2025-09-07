@@ -6,6 +6,8 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const fs = require("fs");
+const Expo = require("expo-server-sdk");
+const expo = new Expo();
 require("dotenv").config();
 
 const app = express();
@@ -32,6 +34,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String }, // Keep email but don't make it required
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
+  expoPushToken: String,
+  notificationEnabled: { type: Boolean, default: true },
 });
 
 // Create a sparse unique index for email to allow null values
@@ -267,7 +271,58 @@ app.post("/api/entries", auth, upload.single("file"), async (req, res) => {
     await entry.save();
     await entry.populate("userId", "username displayName");
 
+    // Send notification to partner
+    try {
+      const users = await User.find({ _id: { $ne: req.user._id } });
+      for (const user of users) {
+        if (
+          user.expoPushToken &&
+          user.notificationEnabled &&
+          Expo.isExpoPushToken(user.expoPushToken)
+        ) {
+          await expo.sendPushNotificationsAsync([
+            {
+              to: user.expoPushToken,
+              sound: "default",
+              title: "New Entry in CoupleJournal",
+              body: `${req.user.displayName} posted a new ${entry.type}`,
+              data: { entryId: entry._id, type: "new_entry" },
+              priority: "high",
+              channelId: "new-entries",
+            },
+          ]);
+        }
+      }
+    } catch (notificationError) {
+      console.error("Notification error:", notificationError);
+      // Don't fail the request if notifications fail
+    }
+
     res.status(201).json(entry);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add endpoint to save push token
+app.post("/api/user/push-token", auth, async (req, res) => {
+  try {
+    const { expoPushToken } = req.body;
+    req.user.expoPushToken = expoPushToken;
+    await req.user.save();
+    res.json({ message: "Push token saved successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add endpoint to toggle notifications
+app.post("/api/user/notifications", auth, async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    req.user.notificationEnabled = enabled;
+    await req.user.save();
+    res.json({ message: `Notifications ${enabled ? "enabled" : "disabled"}` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
