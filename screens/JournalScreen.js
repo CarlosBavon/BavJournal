@@ -31,7 +31,7 @@ const JournalScreen = ({ navigation }) => {
 
   const { user, token, logout } = useAuth();
   const alert = useAlert();
-  const API_BASE_URL = "http://192.168.100.27:5000";
+  const API_BASE_URL = "https://bavjournal.onrender.com";
 
   useEffect(() => {
     if (!user || !token) {

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_BASE_URL = "http://192.168.100.27:5000";
+  const API_BASE_URL = "https://bavjournal.onrender.com";
 
   useEffect(() => {
     // Check if user is logged in on app start

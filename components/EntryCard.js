@@ -99,7 +99,7 @@ const EntryCard = ({
 
       // Download file
       const { uri } = await FileSystem.downloadAsync(
-        `http://192.168.100.27:5000${entry.content}`,
+        `https://bavjournal.onrender.com${entry.content}`,
         fileUri
       );
 
@@ -141,7 +141,7 @@ const EntryCard = ({
       } else {
         // Load and play the audio for the first time
         const { sound } = await Audio.Sound.createAsync(
-          { uri: `http://192.168.100.27:5000${entry.content}` },
+          { uri: `https://bavjournal.onrender.com${entry.content}` },
           { shouldPlay: true }
         );
 
@@ -191,7 +191,7 @@ const EntryCard = ({
         return (
           <View>
             <Image
-              source={{ uri: `http://192.168.100.27:5000${entry.content}` }}
+              source={{ uri: `https://bavjournal.onrender.com${entry.content}` }}
               style={styles.entryImage}
               resizeMode="cover"
             />
@@ -209,7 +209,7 @@ const EntryCard = ({
           <View style={styles.videoContainer}>
             <Video
               ref={videoRef}
-              source={{ uri: `http://192.168.100.27:5000${entry.content}` }}
+              source={{ uri: `https://bavjournal.onrender.com${entry.content}` }}
               style={styles.video}
               resizeMode={ResizeMode.CONTAIN}
               isLooping={false}

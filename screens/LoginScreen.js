@@ -27,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
 
   const { login } = useAuth();
   const alert = useAlert();
-  const API_BASE_URL = "http://192.168.100.27:5000";
+  const API_BASE_URL = "https://bavjournal.onrender.com";
 
   const handleAuth = async () => {
     if (!username || !password || (!isLogin && !displayName)) {
